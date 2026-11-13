@@ -283,6 +283,12 @@ input,textarea{ font-family:inherit; color:inherit; }
 .voice-wave{ flex:1; height:4px; border-radius:4px; background:currentColor; opacity:.3; }
 .voice-dur{ font-size:12px; opacity:.8; }
 #net-bar{position:fixed;left:0;right:0;top:0;z-index:9999;background:#b45309;color:#fff;font:600 13px/1.3 Inter,system-ui,sans-serif;text-align:center;padding:calc(env(safe-area-inset-top,0px) + 6px) 12px 6px}#net-bar[hidden]{display:none}
+.cm-h{padding:14px 18px 6px;font-size:12.5px;font-weight:700;color:var(--paper-dim);text-transform:uppercase;letter-spacing:.05em}
+.cm-item{cursor:pointer}.cm-ic{width:46px;height:46px;border-radius:50%;background:var(--ink-700);display:flex;align-items:center;justify-content:center;font-size:22px;flex:none}
+.cm-sub{font-size:13px;color:var(--paper-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.cm-badge{font-size:11px;font-weight:700;color:var(--amber);border:1px solid var(--amber);border-radius:99px;padding:2px 8px}
+.cm-empty,.cm-rules{padding:16px 20px;font-size:13px;color:var(--paper-dim)}.cm-post{padding:12px 20px;border-bottom:1px solid var(--line)}.cm-meta{font-size:12.5px;color:var(--paper-dim);margin-bottom:3px}
+.cm-act{display:flex;gap:14px;margin-top:6px}.cm-act button{background:none;border:0;color:var(--paper-dim);font-size:12.5px;padding:2px 0}
+.cm-compose{display:flex;gap:8px;align-items:flex-end;padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line)}.cm-compose textarea{flex:1;background:var(--ink-700);border:1px solid var(--line);border-radius:14px;padding:10px 12px;font:inherit;color:inherit;resize:none}
 </style>
 </head>
 <body>
@@ -444,6 +450,7 @@ input,textarea{ font-family:inherit; color:inherit; }
     <button class="fab" id="fab-btn" onclick="openSearch()" aria-label="Nouvelle conversation">＋</button>
     <nav class="bottom-nav">
       <button class="nav-btn active" data-nav="main" onclick="switchTab('main')"><span>💬</span><span>Discussions</span></button>
+      <button class="nav-btn" data-nav="communities" onclick="switchTab('communities')"><span>🏘</span><span>Communautés</span></button>
       <button class="nav-btn" data-nav="profile" onclick="switchTab('profile')"><span>👤</span><span>Profil</span></button>
       <button class="nav-btn" data-nav="settings" onclick="switchTab('settings')"><span>⚙︎</span><span>Réglages</span></button>
     </nav>
@@ -522,6 +529,7 @@ input,textarea{ font-family:inherit; color:inherit; }
     </div>
     <nav class="bottom-nav">
       <button class="nav-btn" data-nav="main" onclick="switchTab('main')"><span>💬</span><span>Discussions</span></button>
+      <button class="nav-btn" data-nav="communities" onclick="switchTab('communities')"><span>🏘</span><span>Communautés</span></button>
       <button class="nav-btn active" data-nav="profile" onclick="switchTab('profile')"><span>👤</span><span>Profil</span></button>
       <button class="nav-btn" data-nav="settings" onclick="switchTab('settings')"><span>⚙︎</span><span>Réglages</span></button>
     </nav>
@@ -615,6 +623,7 @@ input,textarea{ font-family:inherit; color:inherit; }
     </div>
     <nav class="bottom-nav">
       <button class="nav-btn" data-nav="main" onclick="switchTab('main')"><span>💬</span><span>Discussions</span></button>
+      <button class="nav-btn" data-nav="communities" onclick="switchTab('communities')"><span>🏘</span><span>Communautés</span></button>
       <button class="nav-btn" data-nav="profile" onclick="switchTab('profile')"><span>👤</span><span>Profil</span></button>
       <button class="nav-btn active" data-nav="settings" onclick="switchTab('settings')"><span>⚙︎</span><span>Réglages</span></button>
     </nav>
@@ -633,6 +642,24 @@ input,textarea{ font-family:inherit; color:inherit; }
       <button class="btn btn-sm btn-ghost" id="req-tab-rejected" onclick="loadRequests('rejected')">Refusées</button>
     </div>
     <div class="scroll-body" id="requests-list"></div>
+  </section>
+
+  <!-- ============ COMMUNAUTÉS ============ -->
+  <section id="screen-communities" class="screen">
+    <div class="topbar"><div class="topbar-left"><div class="topbar-title">Communautés</div></div></div>
+    <div class="conv-list" id="cm-list"></div>
+    <nav class="bottom-nav">
+      <button class="nav-btn" data-nav="main" onclick="switchTab('main')"><span>💬</span><span>Discussions</span></button>
+      <button class="nav-btn active" data-nav="communities" onclick="switchTab('communities')"><span>🏘</span><span>Communautés</span></button>
+      <button class="nav-btn" data-nav="profile" onclick="switchTab('profile')"><span>👤</span><span>Profil</span></button>
+      <button class="nav-btn" data-nav="settings" onclick="switchTab('settings')"><span>⚙︎</span><span>Réglages</span></button>
+    </nav>
+  </section>
+  <section id="screen-community" class="screen">
+    <div class="form-topbar"><button class="icon-btn" onclick="history.back()">←</button><div class="form-title" id="cmd-title"></div><button class="btn btn-sm btn-ghost" id="cmd-join" onclick="cmToggle()"></button></div>
+    <div class="cm-rules" id="cmd-desc"></div>
+    <div class="scroll-body" id="cmd-posts"></div>
+    <div class="cm-compose" id="cmd-compose"><textarea id="cmd-input" maxlength="1000" rows="2" placeholder="Partage une info utile…"></textarea><button class="btn btn-sm btn-ghost" id="cmd-mic" onclick="crStart()" aria-label="Enregistrer un vocal">🎤</button><button class="btn btn-sm btn-primary" id="cmd-pub" onclick="cmPost()">Publier</button><div id="cmd-rec" style="display:none;flex:1;align-items:center;gap:10px"><span class="rec-dot"></span><b id="cmd-rec-t">0:00</b><span class="cm-sub" style="flex:1">/ 1:30 max</span><button class="btn btn-sm btn-ghost" onclick="crStop(false)">Annuler</button><button class="btn btn-sm btn-primary" onclick="crStop(true)">Envoyer</button></div></div>
   </section>
 
   <!-- ============ FEUILLE D'ACTIONS CONVERSATION ============ -->
@@ -917,6 +944,7 @@ function navigate(screenId, { replace = false } = {}){
 }
 function renderScreen(screenId){
   if(screenId !== 'screen-chat' && REC.mr && REC.mr.state === 'recording') cancelRecording();
+  if(screenId !== 'screen-community' && CR.mr && CR.mr.state === 'recording') crStop(false);
   if(screenId !== 'screen-chat'){ activeChatId = null; activePeerId = null; chatSearchMatches = []; chatSearchIndex = -1; }
   closeConvSheet();
 
@@ -925,6 +953,8 @@ function renderScreen(screenId){
   clearBanners();
 
   if(screenId === 'screen-main'){ renderConversations(); setActiveNav('main'); }
+  if(screenId === 'screen-communities'){ setActiveNav('communities'); loadCommunities(); }
+  if(screenId === 'screen-community' && !CM.cur){ setTimeout(()=>navigate('screen-communities',{replace:true}),0); }
   if(screenId === 'screen-profile'){ renderProfile(); setActiveNav('profile'); }
   if(screenId === 'screen-settings'){ setActiveNav('settings'); document.getElementById('admin-row').style.display = currentUser?.isAdmin ? '' : 'none'; }
   if(screenId === 'screen-search'){ renderSearchResults(); setTimeout(()=>document.getElementById('search-input')?.focus(), 150); }
@@ -1117,7 +1147,7 @@ async function handleLogout(){
 /* ---------------- entrée dans l'app ---------------- */
 function enterApp(){ navigate('screen-main', { replace: true }); }
 function switchTab(tab){
-  const target = tab === 'main' ? 'screen-main' : tab === 'profile' ? 'screen-profile' : 'screen-settings';
+  const target = tab === 'main' ? 'screen-main' : tab === 'communities' ? 'screen-communities' : tab === 'profile' ? 'screen-profile' : 'screen-settings';
   navigate(target);
 }
 function setActiveNav(tab){ document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.dataset.nav === tab)); }
@@ -1492,6 +1522,86 @@ function sendMessage(){
   renderChatMessages();
 }
 
+/* ---------------- communautés ---------------- */
+const CM={list:[],mine:{},cur:null,last:0,timer:null};
+function cmRow(c){return '<div class="conv-item cm-item" onclick="openCommunity(\''+c.id+'\')"><div class="cm-ic">'+escapeHtml(c.icon||'👥')+'</div><div class="conv-mid"><b>'+escapeHtml(c.name)+'</b><div class="cm-sub">'+escapeHtml(c.description||'')+'</div></div>'+(CM.mine[c.id]?'<span class="cm-badge">Membre</span>':'')+'</div>'}
+async function loadCommunities(){
+  const box=document.getElementById('cm-list');
+  const [c,m]=await Promise.all([sb.from('communities').select('*').order('name'),sb.from('community_members').select('community_id,role').eq('user_id',S.uid)]);
+  if(c.error){box.innerHTML='<div class="cm-empty">Communautés indisponibles pour le moment.</div>';return}
+  CM.list=c.data||[];CM.mine={};(m.data||[]).forEach(r=>CM.mine[r.community_id]=r.role);
+  const a=CM.list.filter(x=>CM.mine[x.id]),b=CM.list.filter(x=>!CM.mine[x.id]);
+  box.innerHTML=(a.length?'<div class="cm-h">Mes communautés</div>'+a.map(cmRow).join(''):'')+(b.length?'<div class="cm-h">À découvrir</div>'+b.map(cmRow).join(''):'')||'<div class="cm-empty">Aucune communauté pour le moment.</div>';
+}
+function openCommunity(id){CM.cur=id;navigate('screen-community');cmRender();clearInterval(CM.timer);CM.timer=setInterval(()=>{if(document.getElementById('screen-community').classList.contains('active')){if(!(window._aud&&!window._aud.paused))cmPosts()}else clearInterval(CM.timer)},20000)}
+function cmRender(){
+  const c=CM.list.find(x=>x.id===CM.cur); if(!c)return;
+  const mem=!!CM.mine[c.id];
+  document.getElementById('cmd-title').textContent=c.name;
+  document.getElementById('cmd-join').textContent=mem?'Quitter':'Rejoindre';
+  document.getElementById('cmd-desc').textContent=(c.description?c.description+' · ':'')+'Règles : respecte les autres, pas de fausses informations, pas d’arnaque.';
+  document.getElementById('cmd-compose').style.display=mem?'':'none';
+  cmPosts();
+}
+async function cmPosts(){
+  const box=document.getElementById('cmd-posts'),id=CM.cur; if(!id)return;
+  const {data,error}=await sb.from('community_posts').select('*').eq('community_id',id).order('created_at',{ascending:false}).limit(50);
+  if(id!==CM.cur)return;
+  if(error){box.innerHTML='<div class="cm-empty">Messages indisponibles.</div>';return}
+  CM.px={};(data||[]).forEach(function(p){if(p.audio_path)CM.px[p.id]=p.audio_path});const role=CM.mine[id],mod=currentUser?.isAdmin||role==='mod'||role==='admin';
+  box.innerHTML=(data||[]).map(p=>{const pr=S.profiles[p.author_id]||{},d=new Date(p.created_at);
+    return '<div class="cm-post"><div class="cm-meta"><b>'+escapeHtml(pr.full_name||pr.username||'Membre')+'</b> · '+d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'})+' '+fmtTime(p.created_at)+'</div><div>'+(p.audio_path?'<span class="voice"><button type="button" class="voice-btn" onclick="cmPlay(this,\''+p.audio_path+'\')" aria-label="Écouter">▶</button><span class="voice-wave"></span><span class="voice-dur">'+fmtDur(p.audio_ms)+'</span></span>':escapeHtml(p.body).replace(/\n/g,'<br>'))+'</div><div class="cm-act">'+((p.author_id===S.uid||mod)?'<button onclick="cmDel(\''+p.id+'\')">Supprimer</button>':'')+(p.author_id!==S.uid?'<button onclick="cmReport(\''+p.id+'\')">Signaler</button>':'')+'</div></div>'}).join('')||'<div class="cm-empty">Aucun message pour le moment. Sois le premier à publier.</div>';
+}
+async function cmToggle(){
+  const id=CM.cur,mem=!!CM.mine[id];
+  if(mem&&!confirm('Quitter cette communauté ?'))return;
+  const r=mem?await sb.from('community_members').delete().eq('community_id',id).eq('user_id',S.uid):await sb.from('community_members').insert({community_id:id,user_id:S.uid});
+  if(r.error){toast('Action impossible pour le moment');return}
+  if(mem)delete CM.mine[id];else CM.mine[id]='member';
+  cmRender();
+}
+async function cmPost(){
+  const t=document.getElementById('cmd-input'),body=t.value.trim();
+  if(!body||Date.now()-CM.last<8000){if(body)toast('Patiente quelques secondes');return}
+  const {error}=await sb.from('community_posts').insert({community_id:CM.cur,author_id:S.uid,body});
+  if(error){toast('Message non publié');return}
+  CM.last=Date.now();t.value='';cmPosts();
+}
+async function cmDel(id){if(!confirm('Supprimer ce message ?'))return;const {error}=await sb.from('community_posts').delete().eq('id',id);if(!error&&CM.px&&CM.px[id])sb.storage.from('community-voice').remove([CM.px[id]]);toast(error?'Suppression impossible':'Message supprimé');cmPosts()}
+async function cmReport(id){if(!confirm('Signaler ce message aux modérateurs ?'))return;const {error}=await sb.from('community_reports').insert({post_id:id,reporter_id:S.uid,reason:'signalé'});toast(error?'Déjà signalé ou impossible':'Merci, signalement envoyé')}
+
+const CR={mr:null,chunks:[],stream:null,t0:0,timer:null,cancelled:false,MAX:90000};
+function crUI(on){['cmd-input','cmd-mic','cmd-pub'].forEach(i=>document.getElementById(i).style.display=on?'none':'');document.getElementById('cmd-rec').style.display=on?'flex':'none'}
+async function crStart(){
+  if(!navigator.mediaDevices||!window.MediaRecorder){toast('Enregistrement non pris en charge ici');return}
+  try{CR.stream=await navigator.mediaDevices.getUserMedia({audio:true})}catch(e){toast('Micro bloqué : autorise-le dans les réglages du navigateur');return}
+  const mime=['audio/webm;codecs=opus','audio/webm','audio/mp4'].find(t=>MediaRecorder.isTypeSupported(t))||'';
+  CR.chunks=[];CR.cancelled=false;CR.mr=new MediaRecorder(CR.stream,mime?{mimeType:mime}:undefined);
+  CR.mr.ondataavailable=e=>{if(e.data.size)CR.chunks.push(e.data)};CR.mr.onstop=crDone;CR.mr.start();CR.t0=Date.now();crUI(true);
+  CR.timer=setInterval(()=>{const ms=Date.now()-CR.t0;document.getElementById('cmd-rec-t').textContent=fmtDur(ms);if(ms>=CR.MAX){toast('Limite de 1 min 30 atteinte : vocal envoyé');crStop(true)}},250);
+}
+function crStop(send){if(!CR.mr||CR.mr.state!=='recording')return;CR.cancelled=!send;CR.mr.stop()}
+async function crDone(){
+  clearInterval(CR.timer);CR.stream.getTracks().forEach(t=>t.stop());crUI(false);document.getElementById('cmd-rec-t').textContent='0:00';
+  const ms=Math.min(Date.now()-CR.t0,CR.MAX);if(CR.cancelled)return;if(ms<700){toast('Vocal trop court');return}
+  if(Date.now()-CM.last<8000){toast('Patiente quelques secondes');return}
+  const blob=new Blob(CR.chunks,{type:CR.mr.mimeType||'audio/webm'}),type=(blob.type||'audio/webm').split(';')[0];
+  const path=S.uid+'/'+Date.now()+'_'+Math.random().toString(36).slice(2,8)+(type.includes('mp4')?'.m4a':'.webm');
+  toast('Envoi du vocal…');
+  const up=await sb.storage.from('community-voice').upload(path,blob,{contentType:type});
+  if(up.error){toast('Vocal non envoyé');return}
+  const {error}=await sb.from('community_posts').insert({community_id:CM.cur,author_id:S.uid,body:'Message vocal',audio_path:path,audio_ms:ms});
+  if(error){sb.storage.from('community-voice').remove([path]);toast('Vocal non publié');return}
+  CM.last=Date.now();cmPosts();
+}
+async function cmPlay(btn,path){
+  if(window._aud&&window._audBtn===btn&&!window._aud.paused){window._aud.pause();btn.textContent='▶';return}
+  if(window._aud){window._aud.pause();if(window._audBtn)window._audBtn.textContent='▶'}
+  const {data,error}=await sb.storage.from('community-voice').createSignedUrl(path,3600);
+  if(error){toast('Lecture impossible');return}
+  const a=new Audio(data.signedUrl);window._aud=a;window._audBtn=btn;btn.textContent='⏸';
+  a.onended=()=>{btn.textContent='▶'};a.onerror=()=>{btn.textContent='▶';toast('Lecture impossible')};a.play().catch(()=>{btn.textContent='▶'});
+}
 /* ---------------- file d'attente hors ligne + réseau + installation ---------------- */
 const QUEUE={k:'baro_q',get(){try{return JSON.parse(localStorage.getItem(this.k)||'[]')}catch(e){return[]}},set(a){try{localStorage.setItem(this.k,JSON.stringify(a))}catch(e){}},
   add(peer,text,tid){const a=this.get();a.push({peer,text,tid,uid:S.uid});this.set(a)},busy:false,
