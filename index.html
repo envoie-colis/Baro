@@ -1050,6 +1050,7 @@ const TYPING_MARK = `<span class="typing-pulse mark"><svg viewBox="0 0 40 24" wi
 /* ---------------- session, inscription, connexion ---------------- */
 async function startSession(user){
   S.uid = user.id; S.email = user.email; S.phone = user.user_metadata?.phone || '';
+  if(user.user_metadata?.must_change_password) setTimeout(forcePwChange, 400);
   const lerr = await loadAll();
   if(lerr){ showErr('Chargement impossible (le script SQL est-il à jour ?) : ' + lerr); return; }
   currentUser = DB.findUserById(S.uid);
@@ -1765,6 +1766,21 @@ async function loadMyExtra(){
   set('pf-city',MY.city);set('pf-job',MY.job);set('pf-school',MY.school);set('pf-quarter',MY.quarter);set('pf-about',MY.about);fillExtraForm();
 }
 (function(){const e=document.getElementById('edit-city');if(e)e.innerHTML='<option value="">—</option>'+CITIES.map(c=>'<option>'+c+'</option>').join('')+'<option value="Autre">Autre ville</option>'})();
+function forcePwChange(){
+  if(document.getElementById('pwf')) return;
+  const inp='width:100%;padding:12px;margin-bottom:8px;border-radius:12px;border:1px solid var(--line);background:var(--ink-700);color:inherit;font:inherit';
+  const d=document.createElement('div');d.id='pwf';d.style.cssText='position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.88);display:flex;align-items:center;justify-content:center;padding:20px';
+  d.innerHTML='<div style="background:var(--ink-800,#16202e);color:var(--paper,#fff);max-width:420px;width:100%;border-radius:18px;padding:22px"><div style="font-size:18px;font-weight:700;margin-bottom:6px">Choisis ton nouveau mot de passe</div><div style="font-size:13px;opacity:.8;margin-bottom:14px">Ton mot de passe a été réinitialisé. Tu dois en choisir un nouveau pour continuer.</div><input id="pwf1" type="password" placeholder="Nouveau mot de passe (8 caractères minimum)" style="'+inp+'"><input id="pwf2" type="password" placeholder="Retape le mot de passe" style="'+inp+'"><div id="pwf-err" style="color:#f87171;font-size:13px;min-height:18px;margin-bottom:6px"></div><button class="btn btn-primary" style="width:100%" id="pwf-ok">Enregistrer</button></div>';
+  document.body.appendChild(d);
+  document.getElementById('pwf-ok').onclick=async()=>{
+    const a=document.getElementById('pwf1').value,b=document.getElementById('pwf2').value,e=document.getElementById('pwf-err');
+    if(a.length<8){e.textContent='8 caractères minimum.';return}
+    if(a!==b){e.textContent='Les mots de passe ne correspondent pas.';return}
+    const {error}=await sb.auth.updateUser({password:a,data:{must_change_password:false}});
+    if(error){e.textContent=/different/i.test(error.message)?'Choisis un mot de passe différent du temporaire.':error.message;return}
+    d.remove();toast('Mot de passe mis à jour');
+  };
+}
 function cycleRate(){const r=[1,1.5,2];window._rate=r[(r.indexOf(window._rate||1)+1)%3];document.querySelectorAll('.voice-spd').forEach(b=>b.textContent=window._rate+'x');if(window._aud)window._aud.playbackRate=window._rate}
 async function delMsg(id){
   const m=S.msgs.find(x=>x.id===id); if(!m||m.senderId!==S.uid) return;
