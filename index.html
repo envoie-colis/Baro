@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<meta name="theme-color" content="#0c1420">
+<meta name="theme-color" content="#f7f4ee">
+<script>(function(){try{var m=localStorage.getItem("baro_theme")||"light",d=m==="dark"||(m==="auto"&&window.matchMedia&&matchMedia("(prefers-color-scheme: dark)").matches);document.documentElement.setAttribute("data-theme",d?"dark":"light");var t=document.querySelector("meta[name=theme-color]");if(t)t.content=d?"#0c1420":"#f7f4ee"}catch(e){}})()</script>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -294,6 +295,20 @@ input,textarea{ font-family:inherit; color:inherit; }
 #cr-badge{background:var(--amber);color:var(--ink-900);border-radius:99px;font-size:11px;font-weight:700;padding:0 6px;margin-left:2px}
 #reg-city,#cm-city-sel{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--ink-700);color:var(--paper);font:inherit}.cm-city{padding:12px 18px;font-size:13px;color:var(--paper-dim)}.cm-city select{margin-top:6px}
 .pv-l{margin:3px 0;font-size:14px}.pv-about{margin:10px 0 4px;font-size:14px;color:var(--paper-dim)}#edit-city,#edit-about{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--ink-700);color:var(--paper);font:inherit}
+
+/* --- thème clair (par défaut) --- */
+:root[data-theme="light"]{
+  --ink-900:#f7f4ee; --ink-800:#ffffff; --ink-700:#eee8dc; --ink-600:#e2d9c8; --line:#d8cfbd;
+  --paper:#1c2331; --paper-dim:#556072; --amber:#b45309; --amber-dim:#92400e; --teal:#0f766e; --danger:#b91c1c;
+  --shadow:0 12px 30px -12px rgba(0,0,0,.2); color-scheme:light;
+}
+:root[data-theme="light"] .avatar{ color:#0c1420; }
+:root[data-theme="light"] .banner-error{ color:#9b1c1c; }
+:root[data-theme="light"] .banner-info{ color:#0f5f58; }
+:root[data-theme="light"] .conv-item,:root[data-theme="light"] .user-row{ border-bottom-color:rgba(0,0,0,.07); }
+:root[data-theme="light"] .info-row,:root[data-theme="light"] .settings-row{ border-bottom-color:rgba(0,0,0,.08); }
+:root[data-theme="light"] .bubble-row.theirs .voice-btn{ background:rgba(0,0,0,.08); }
+#theme-sel{padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--ink-700);color:var(--paper);font:inherit}
 </style>
 </head>
 <body>
@@ -366,6 +381,7 @@ input,textarea{ font-family:inherit; color:inherit; }
       </div>
       <div class="form-actions">
         <button class="btn btn-primary" style="width:100%" onclick="handleRegister()">Créer mon compte</button>
+        <p class="form-lede" style="text-align:center;margin-top:12px">En créant un compte, tu acceptes les <a href="#" onclick="navigate('screen-rules');return false" style="text-decoration:underline">règles et la confidentialité</a>.</p>
         <button class="btn-link" onclick="navigate('screen-login')">J'ai déjà un compte</button>
       </div>
     </div>
@@ -404,14 +420,14 @@ input,textarea{ font-family:inherit; color:inherit; }
     </div>
     <div class="form-body">
       <div id="forgot-step-1">
-        <p class="form-lede">Indique le nom d'utilisateur, l'e-mail ou le téléphone du compte. Dans cette v1 sans serveur, le code de vérification s'affiche directement à l'écran — avec Supabase, il partira par e-mail réel.</p>
+        <p class="form-lede">Entre ton numéro de téléphone. L'administrateur recevra ta demande et te contactera pour vérifier que c'est bien toi, puis te donnera un mot de passe temporaire.</p>
         <div id="forgot-banner-1" class="banner banner-error"></div>
         <div class="field">
-          <label>Numéro ou e-mail du compte</label>
+          <label>Numéro de téléphone du compte</label>
           <input id="forgot-id" type="text" placeholder="Numéro ou e-mail">
         </div>
         <div class="form-actions">
-          <button class="btn btn-primary" style="width:100%" onclick="handleForgotStep1()">Envoyer le code</button>
+          <button class="btn btn-primary" style="width:100%" onclick="handleForgotStep1()">Envoyer la demande</button>
         </div>
       </div>
       <div id="forgot-step-2" style="display:none;">
@@ -623,6 +639,29 @@ input,textarea{ font-family:inherit; color:inherit; }
         <div><div class="settings-row-label">Demandes d'inscription</div><div class="settings-row-sub">Accepter ou refuser les nouveaux membres</div></div>
         <button class="btn-link" onclick="openRequests()">Ouvrir</button>
       </div>
+      <div class="settings-row" id="admin-row2" style="display:none">
+        <div><div class="settings-row-label">Mots de passe oubliés</div><div class="settings-row-sub">Réinitialiser le mot de passe d'un membre</div></div>
+        <button class="btn-link" onclick="openResets()">Ouvrir</button>
+      </div>
+      <div class="settings-row" id="admin-row3" style="display:none">
+        <div><div class="settings-row-label">Signalements</div><div class="settings-row-sub">Messages signalés dans les communautés</div></div>
+        <button class="btn-link" onclick="openReports()">Ouvrir</button>
+      </div>
+      <div class="settings-row">
+        <div><div class="settings-row-label">Règles et confidentialité</div><div class="settings-row-sub">Ce qui est permis et ce que garde Baro</div></div>
+        <button class="btn-link" onclick="navigate('screen-rules')">Lire</button>
+      </div>
+      <div class="settings-row">
+        <div><div class="settings-row-label">Signaler un problème ou proposer une idée</div><div class="settings-row-sub">Envoie-nous un message sur WhatsApp</div></div>
+        <button class="btn-link" onclick="sendFeedback()">Écrire</button>
+      </div>
+      <div class="settings-row">
+        <div><div class="settings-row-label">Apparence</div><div class="settings-row-sub">Clair, sombre ou selon ton téléphone</div></div>
+        <select id="theme-sel" onchange="setTheme(this.value)"><option value="light">Clair</option><option value="dark">Sombre</option><option value="auto">Automatique</option></select>
+      </div>
+      <div class="settings-row">
+        <div><div class="settings-row-label">Version</div><div class="settings-row-sub" id="app-version"></div></div>
+      </div>
       <div class="settings-row">
         <div><div class="settings-row-label">Notifications</div><div class="settings-row-sub">Arrivée dans une prochaine version</div></div>
         <span class="tag-soon">Bientôt</span>
@@ -673,6 +712,41 @@ input,textarea{ font-family:inherit; color:inherit; }
     <div class="form-topbar"><button class="icon-btn" onclick="history.back()">←</button><div class="form-title">Mes amis</div></div>
     <div style="padding:8px 14px"><input id="fr-q" type="text" placeholder="Filtrer par nom" oninput="renderFriends()" style="width:100%;padding:11px 14px;border-radius:12px;border:1px solid var(--line);background:var(--ink-700);color:var(--paper);font:inherit"></div>
     <div class="scroll-body" id="fr-list"></div>
+  </section>
+
+  <section id="screen-rules" class="screen">
+    <div class="form-topbar"><button class="icon-btn" onclick="history.back()">←</button><div class="form-title">Règles et confidentialité</div></div>
+    <div class="scroll-body" style="padding:6px 20px 30px;font-size:14.5px;line-height:1.55">
+      <p class="cm-sub" style="white-space:normal">Baro est en version de test. Ces règles peuvent évoluer.</p>
+      <h3>Les règles</h3>
+      <ul>
+        <li>Respecte les autres : pas d'insultes, de harcèlement ni de menaces.</li>
+        <li>Pas d'arnaque, de fausses informations, de publicité répétée (spam).</li>
+        <li>Pas de contenu sexuel, violent ou choquant.</li>
+        <li>Ne te fais pas passer pour quelqu'un d'autre.</li>
+        <li>Tu peux signaler un message dans les communautés avec le bouton « Signaler ». L'administrateur peut supprimer un message et suspendre un compte en cas d'abus.</li>
+      </ul>
+      <h3>Tes informations</h3>
+      <ul>
+        <li>Ton nom, ta ville, ta photo et ce que tu écris dans ton profil sont enregistrés pour faire fonctionner Baro.</li>
+        <li>Qui voit quoi : la ville, la fonction et « À propos » sont visibles par les membres approuvés. L'école et le quartier sont visibles seulement par tes amis.</li>
+        <li>Ton numéro de téléphone sert à te connecter et à te retrouver. Il n'est pas affiché sur ta fiche.</li>
+        <li>Les messages privés, vocaux et photos sont stockés sur des serveurs en ligne. Ils ne sont pas chiffrés de bout en bout. L'équipe de Baro ne les consulte pas, sauf pour traiter un signalement grave.</li>
+        <li>Tu peux supprimer tes messages, tes conversations et demander la suppression de ton compte à l'administrateur.</li>
+      </ul>
+      <h3>Aide</h3>
+      <p>Un problème, une idée ? Utilise « Signaler un problème ou proposer une idée » dans les Réglages.</p>
+    </div>
+  </section>
+
+  <section id="screen-reports" class="screen">
+    <div class="form-topbar"><button class="icon-btn" onclick="history.back()">←</button><div class="form-title">Signalements</div></div>
+    <div class="scroll-body" id="rp-list"></div>
+  </section>
+
+  <section id="screen-resets" class="screen">
+    <div class="form-topbar"><button class="icon-btn" onclick="history.back()">←</button><div class="form-title">Mots de passe oubliés</div></div>
+    <div class="scroll-body" id="rs-list"></div>
   </section>
 
   <section id="screen-contact-requests" class="screen">
@@ -998,7 +1072,7 @@ function renderScreen(screenId){
   if(screenId === 'screen-communities'){ setActiveNav('communities'); loadCommunities(); }
   if(screenId === 'screen-community' && !CM.cur){ setTimeout(()=>navigate('screen-communities',{replace:true}),0); }
   if(screenId === 'screen-profile'){ renderProfile(); setActiveNav('profile'); }
-  if(screenId === 'screen-settings'){ setActiveNav('settings'); document.getElementById('admin-row').style.display = currentUser?.isAdmin ? '' : 'none'; }
+  if(screenId === 'screen-settings'){ setActiveNav('settings'); document.getElementById('admin-row').style.display = currentUser?.isAdmin ? '' : 'none'; document.getElementById('admin-row2').style.display = currentUser?.isAdmin ? '' : 'none'; document.getElementById('admin-row3').style.display = currentUser?.isAdmin ? '' : 'none'; }
   if(screenId === 'screen-search'){ renderSearchResults(); setTimeout(()=>document.getElementById('search-input')?.focus(), 150); }
   if(screenId === 'screen-edit-profile'){ fillEditProfileForm(); }
 }
@@ -1063,9 +1137,9 @@ async function startSession(user){
 }
 function showPending(status){
   const rej = status === 'rejected';
-  document.getElementById('pending-title').textContent = rej ? 'Demande refusée' : 'Demande en attente';
+  document.getElementById('pending-title').textContent = rej ? 'Accès refusé ou suspendu' : 'Demande en attente';
   document.getElementById('pending-text').textContent = rej
-    ? "L'administrateur n'a pas accepté cette demande. Contacte-le directement si c'est une erreur."
+    ? "Ton accès à Baro est refusé ou suspendu. Contacte l'administrateur si c'est une erreur."
     : "Ton compte est créé. Il sera activé dès que l'administrateur aura accepté ta demande. Cette page se met à jour toute seule.";
   navigate('screen-pending', { replace:true });
   clearInterval(window._pendTimer);
@@ -1169,12 +1243,12 @@ function openForgotPassword(){
 }
 async function handleForgotStep1(){
   clearBanners();
-  const email = document.getElementById('forgot-id').value.trim();
-  if(!email){ showBanner('forgot-banner-1', 'Entre ton numéro ou ton e-mail.'); return; }
-  if(!email.includes('@')){ showBanner('forgot-banner-1', "Les comptes créés avec un numéro n'ont pas de réinitialisation automatique. Contacte l'administrateur."); return; }
-  const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.href.split('#')[0] });
-  if(error){ showBanner('forgot-banner-1', error.message); return; }
-  toast('Si ce compte existe, un e-mail vient de partir.');
+  const raw = document.getElementById('forgot-id').value.trim();
+  const ph = raw.includes('@') ? null : normalizePhone(raw);
+  if(!ph){ showBanner('forgot-banner-1', 'Entre ton numéro de téléphone (9 chiffres, ex. 620 00 00 00).'); return; }
+  const { error } = await sb.rpc('request_password_reset', { p_phone: ph });
+  if(error){ showBanner('forgot-banner-1', 'Envoi impossible : ' + error.message); return; }
+  toast('Demande envoyée. L’administrateur va te contacter.');
   navigate('screen-login', { replace:true });
 }
 async function handleForgotStep2(){}
@@ -1218,13 +1292,17 @@ function fillEditProfileForm(){
   document.getElementById('pw-new').value = '';
   document.getElementById('pw-new2').value = '';
   editAvatarColorChoice = colorFor(currentUser);
+  renderSwatches();
+}
+function renderSwatches(){
   const grid = document.getElementById('avatar-swatches');
   grid.innerHTML = '';
   AVATAR_PALETTE.forEach(hex => {
     const sw = document.createElement('button');
+    sw.type = 'button';
     sw.className = 'swatch' + (hex === editAvatarColorChoice ? ' selected' : '');
     sw.style.background = hex;
-    sw.onclick = () => { editAvatarColorChoice = hex; fillEditProfileForm(); };
+    sw.onclick = () => { editAvatarColorChoice = hex; renderSwatches(); };
     grid.appendChild(sw);
   });
 }
@@ -1622,7 +1700,7 @@ async function loadCommunities(){
   const box=document.getElementById('cm-list');
   const [c,m]=await Promise.all([sb.from('communities').select('*').order('name'),sb.from('community_members').select('community_id,role').eq('user_id',S.uid)]);
   if(c.error){box.innerHTML='<div class="cm-empty">Communautés indisponibles pour le moment.</div>';return}
-  const me=await sb.from('profiles').select('city').eq('id',S.uid).maybeSingle();CM.city=me.error?null:((me.data&&me.data.city)||'');
+  const me=await sb.rpc('my_profile_extra');CM.city=me.error?null:((me.data&&me.data[0]&&me.data[0].city)||'');
   CM.list=c.data||[];CM.mine={};(m.data||[]).forEach(r=>CM.mine[r.community_id]=r.role);
   const a=CM.list.filter(x=>CM.mine[x.id]),b=CM.list.filter(x=>!CM.mine[x.id]);
   box.innerHTML=(a.length?'<div class="cm-h">Mes communautés</div>'+a.map(cmRow).join(''):'')+(b.length?'<div class="cm-h">À découvrir</div>'+b.map(cmRow).join(''):'')||'<div class="cm-empty">Aucune communauté pour le moment.</div>';
@@ -1643,9 +1721,12 @@ async function cmPosts(){
   const {data,error}=await sb.from('community_posts').select('*').eq('community_id',id).order('created_at',{ascending:false}).limit(50);
   if(id!==CM.cur)return;
   if(error){box.innerHTML='<div class="cm-empty">Messages indisponibles.</div>';return}
+  const miss=[...new Set((data||[]).map(p=>p.author_id))].filter(i=>!S.profiles[i]);
+  if(miss.length){const {data:pp}=await sb.from('profiles').select(PROFILE_COLS).in('id',miss);(pp||[]).forEach(r=>S.profiles[r.id]=r)}
   CM.px={};(data||[]).forEach(function(p){if(p.audio_path)CM.px[p.id]=p.audio_path});const role=CM.mine[id],mod=currentUser?.isAdmin||role==='mod'||role==='admin';
   box.innerHTML=(data||[]).map(p=>{const pr=S.profiles[p.author_id]||{},d=new Date(p.created_at);
-    return '<div class="cm-post"><div class="cm-meta"><b>'+escapeHtml(pr.full_name||pr.username||'Membre')+'</b> · '+d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'})+' '+fmtTime(p.created_at)+'</div><div>'+(p.audio_path?'<span class="voice"><button type="button" class="voice-btn" onclick="cmPlay(this,\''+p.audio_path+'\')" aria-label="Écouter">▶</button><span class="voice-wave"></span><span class="voice-dur">'+fmtDur(p.audio_ms)+'</span><button type="button" class="voice-spd" onclick="cycleRate()">'+(window._rate||1)+'x</button></span>':escapeHtml(p.body).replace(/\n/g,'<br>'))+'</div><div class="cm-act">'+((p.author_id===S.uid||mod)?'<button onclick="cmDel(\''+p.id+'\')">Supprimer</button>':'')+(p.author_id!==S.uid?'<button onclick="cmReport(\''+p.id+'\')">Signaler</button>':'')+'</div></div>'}).join('')||'<div class="cm-empty">Aucun message pour le moment. Sois le premier à publier.</div>';
+    const au=mapProfile(pr.id?pr:{id:p.author_id,full_name:'Membre'});
+    return '<div class="cm-post" style="display:flex;gap:10px"><div class="avatar" style="width:36px;height:36px;font-size:13px;flex:none;'+avStyle(au)+'">'+avText(au)+'</div><div style="flex:1;min-width:0"><div class="cm-meta"><b>'+escapeHtml(pr.full_name||pr.username||'Membre')+'</b> · '+d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'})+' '+fmtTime(p.created_at)+'</div><div>'+(p.audio_path?'<span class="voice"><button type="button" class="voice-btn" onclick="cmPlay(this,\''+p.audio_path+'\')" aria-label="Écouter">▶</button><span class="voice-wave"></span><span class="voice-dur">'+fmtDur(p.audio_ms)+'</span><button type="button" class="voice-spd" onclick="cycleRate()">'+(window._rate||1)+'x</button></span>':escapeHtml(p.body).replace(/\n/g,'<br>'))+'</div><div class="cm-act">'+((p.author_id===S.uid||mod)?'<button onclick="cmDel(\''+p.id+'\')">Supprimer</button>':'')+(p.author_id!==S.uid?'<button onclick="cmReport(\''+p.id+'\')">Signaler</button>':'')+'</div></div></div>'}).join('')||'<div class="cm-empty">Aucun message pour le moment. Sois le premier à publier.</div>';
 }
 async function cmToggle(){
   const id=CM.cur,mem=!!CM.mine[id];
@@ -1760,8 +1841,9 @@ function renderFriends(){
 const MY={};
 function fillExtraForm(){const g=(id,v)=>{const e=document.getElementById(id);if(e)e.value=v||''};g('edit-city',MY.city);g('edit-job',MY.job);g('edit-school',MY.school);g('edit-quarter',MY.quarter);g('edit-about',MY.about)}
 async function loadMyExtra(){
-  const {data,error}=await sb.from('profiles').select('city,about,job,school,quarter').eq('id',S.uid).maybeSingle();
-  if(error||!data)return;Object.assign(MY,data);
+  const {data,error}=await sb.rpc('my_profile_extra');
+  if(error){ if(!window._pfErr){window._pfErr=1;toast('Profil : '+error.message)} }
+  else if(data&&data[0]) Object.assign(MY,data[0]);
   const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v||'—'};
   set('pf-city',MY.city);set('pf-job',MY.job);set('pf-school',MY.school);set('pf-quarter',MY.quarter);set('pf-about',MY.about);fillExtraForm();
 }
@@ -1781,6 +1863,57 @@ function forcePwChange(){
     d.remove();toast('Mot de passe mis à jour');
   };
 }
+function openResets(){navigate('screen-resets');loadResets()}
+async function loadResets(){
+  const box=document.getElementById('rs-list');box.innerHTML='<div class="cm-empty">Chargement…</div>';
+  const {data,error}=await sb.rpc('admin_list_resets');
+  if(error){box.innerHTML='<div class="cm-empty">Indisponible : '+escapeHtml(error.message)+'</div>';return}
+  if(!(data||[]).length){box.innerHTML='<div class="cm-empty">Aucune demande pour le moment.</div>';return}
+  box.innerHTML='';
+  data.forEach(r=>{const row=document.createElement('div');row.className='cm-post';
+    const d=x=>x?new Date(x).toLocaleDateString('fr-FR'):'—';
+    row.innerHTML='<div><b>'+escapeHtml(r.full_name||'Sans nom')+'</b> · +224 '+escapeHtml(r.phone)+'</div><div class="cm-meta">Ville : '+escapeHtml(r.city||'—')+' · Inscrit le '+d(r.created_at_user)+' · Amis : '+r.nb_amis+' · Demande du '+d(r.requested_at)+'</div><div class="cm-act"></div>';
+    const a=row.querySelector('.cm-act'),ok=document.createElement('button'),no=document.createElement('button');
+    ok.textContent='Réinitialiser';ok.onclick=()=>doReset(r);
+    no.textContent='Ignorer';no.onclick=async()=>{await sb.rpc('admin_dismiss_reset',{req:r.id});loadResets()};
+    a.append(ok,no);box.appendChild(row)});
+}
+async function doReset(r){
+  if(!confirm('As-tu vérifié que c’est bien '+(r.full_name||'cette personne')+' ?\nSon ancien mot de passe ne marchera plus.'))return;
+  const a=new Uint32Array(1);crypto.getRandomValues(a);const temp='Temp'+String(a[0]%900000+100000);
+  const {error}=await sb.rpc('admin_reset_password',{req:r.id,temp:temp});
+  if(error){toast('Échec : '+error.message);return}
+  const msg='Bonjour, ton mot de passe Baro a été réinitialisé.\nMot de passe temporaire : '+temp+'\nConnecte-toi, puis choisis ton nouveau mot de passe.';
+  closeProfileView();
+  const d=document.createElement('div');d.id='pv';d.style.cssText='position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:20px';
+  d.innerHTML='<div style="background:var(--ink-800,#16202e);color:var(--paper,#fff);max-width:420px;width:100%;border-radius:18px;padding:22px;text-align:center"><div style="font-size:14px;opacity:.8">Mot de passe temporaire de '+escapeHtml(r.full_name||'')+'</div><div style="font-size:30px;font-weight:800;letter-spacing:.04em;margin:10px 0 16px;font-family:monospace">'+temp+'</div><a class="btn btn-primary" style="display:block;text-decoration:none;margin-bottom:10px" target="_blank" rel="noopener" href="https://wa.me/224'+r.phone+'?text='+encodeURIComponent(msg)+'">Envoyer sur WhatsApp</a><button class="btn btn-sm btn-ghost" onclick="closeProfileView()">Fermer</button><div style="font-size:12px;opacity:.7;margin-top:10px">Note-le maintenant : il ne sera plus affiché.</div></div>';
+  document.body.appendChild(d);loadResets();
+}
+const APP_VERSION='0.9 (test)',SUPPORT_WA='224628095918';
+(function(){const e=document.getElementById('app-version');if(e)e.textContent='Baro '+APP_VERSION})();
+function sendFeedback(){const msg='Baro '+APP_VERSION+' – '+((currentUser&&currentUser.fullName)||'')+'\nMon message : ';window.open('https://wa.me/'+SUPPORT_WA+'?text='+encodeURIComponent(msg),'_blank')}
+function openReports(){navigate('screen-reports');loadReports()}
+async function loadReports(){
+  const box=document.getElementById('rp-list');box.innerHTML='<div class="cm-empty">Chargement…</div>';
+  const {data,error}=await sb.rpc('admin_list_reports');
+  if(error){box.innerHTML='<div class="cm-empty">Indisponible : '+escapeHtml(error.message)+'</div>';return}
+  if(!(data||[]).length){box.innerHTML='<div class="cm-empty">Aucun signalement.</div>';return}
+  box.innerHTML='';
+  data.forEach(r=>{const row=document.createElement('div');row.className='cm-post';
+    row.innerHTML='<div class="cm-meta"><b>'+escapeHtml(r.community)+'</b> · '+escapeHtml(r.author_name||'Membre')+' · '+r.reports+' signalement(s)</div><div>'+(r.audio_path?'🎤 Message vocal':escapeHtml(r.body).replace(/\n/g,'<br>'))+'</div><div class="cm-act"></div>';
+    const a=row.querySelector('.cm-act'),mk=(t,fn)=>{const b=document.createElement('button');b.textContent=t;b.onclick=fn;a.appendChild(b)};
+    mk('Supprimer le message',async()=>{if(!confirm('Supprimer ce message ?'))return;const {data:p,error:e}=await sb.rpc('admin_delete_post',{post:r.post_id});if(e){toast('Échec : '+e.message);return}if(p)sb.storage.from('community-voice').remove([p]);toast('Message supprimé');loadReports()});
+    mk('Suspendre l’auteur',async()=>{if(!confirm('Suspendre '+(r.author_name||'ce membre')+' ? Il ne pourra plus utiliser Baro.'))return;const {error:e}=await sb.rpc('admin_suspend_member',{target:r.author_id,suspend:true});toast(e?'Échec : '+e.message:'Membre suspendu')});
+    mk('Ignorer',async()=>{await sb.rpc('admin_dismiss_reports',{post:r.post_id});loadReports()});
+    box.appendChild(row)});
+}
+function setTheme(m){
+  try{localStorage.setItem('baro_theme',m)}catch(e){}
+  const d=m==='dark'||(m==='auto'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);
+  document.documentElement.setAttribute('data-theme',d?'dark':'light');
+  const t=document.querySelector('meta[name=theme-color]');if(t)t.content=d?'#0c1420':'#f7f4ee';
+}
+(function(){const e=document.getElementById('theme-sel');if(e){let m='light';try{m=localStorage.getItem('baro_theme')||'light'}catch(x){}e.value=m}})();
 function cycleRate(){const r=[1,1.5,2];window._rate=r[(r.indexOf(window._rate||1)+1)%3];document.querySelectorAll('.voice-spd').forEach(b=>b.textContent=window._rate+'x');if(window._aud)window._aud.playbackRate=window._rate}
 async function delMsg(id){
   const m=S.msgs.find(x=>x.id===id); if(!m||m.senderId!==S.uid) return;
@@ -1836,11 +1969,29 @@ function initPwEyes(){
     w.appendChild(b);
   });
 }
+function hasStoredSession(){try{return Object.keys(localStorage).some(k=>/^sb-.+-auth-token$/.test(k))}catch(e){return false}}
+function showRetry(){
+  if(document.getElementById('retry')) return;
+  const d=document.createElement('div');d.id='retry';d.style.cssText='position:fixed;inset:0;z-index:99998;background:var(--ink-900,#0c1420);color:var(--paper,#fff);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center';
+  d.innerHTML='<div style="font-size:28px;font-weight:800">Baro</div><div style="opacity:.8">Connexion impossible pour le moment.<br>Vérifie ton réseau : tu restes connecté.</div><button class="btn btn-primary" id="retry-btn">Réessayer</button><button class="btn btn-sm btn-ghost" id="retry-out">Se déconnecter</button>';
+  document.body.appendChild(d);
+  document.getElementById('retry-btn').onclick=()=>openSession();
+  document.getElementById('retry-out').onclick=async()=>{await sb.auth.signOut();d.remove();navigate('screen-home',{replace:true})};
+}
+async function openSession(){
+  const r=document.getElementById('retry');
+  const { data:{ session } } = await sb.auth.getSession();
+  if(session){ await startSession(session.user); if(currentUser){ if(r) r.remove(); return; } showRetry(); return; }
+  if(hasStoredSession()){ showRetry(); return; }
+  if(r) r.remove();
+  navigate('screen-home', { replace:true });
+}
+window.addEventListener('online',()=>{ if(document.getElementById('retry')) openSession(); });
+setInterval(()=>{ if(document.getElementById('retry') && navigator.onLine) openSession(); }, 12000);
 (async function init(){
   initPwEyes();
-  const { data:{ session } } = await sb.auth.getSession();
-  if(session){ await startSession(session.user); if(currentUser) return; }
-  navigate('screen-home', { replace: true });
+  try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(()=>{}); }catch(e){}
+  openSession();
 })();
 </script>
 </body>
